@@ -1,17 +1,15 @@
 function LandingNavbar({ onLoginClick, onSignupClick }) {
-  const clicked=()=>{
-    console.log("clicked")
-  }
   return (
-    <nav className="navbar bg-transparent px-6">
+    <nav className="glass mx-8 mt-5 flex items-center rounded-2xl px-6 py-2.5">
 
       <div className="flex-1">
-        <span className="text-xl font-bold">Pin Memories</span>
+        <span className="glass-text text-[1.2rem] font-medium tracking-tight"> Where You Been </span>
       </div>
 
-      <div className="flex gap-2">
-        <button className="btn btn-ghost" onClick={onLoginClick}> Login </button>
-        <button className="btn btn-primary" onClick={onSignupClick}> Sign Up </button>
+      <div className="flex items-center gap-2">
+        <button onClick={onLoginClick} className="glass-text rounded-full px-4 py-1.5 text-sm font-normal transition duration-300 hover:bg-white/10" > Login </button>
+
+        <button onClick={onSignupClick} className="glass glass-interactive glass-text rounded-full px-4 py-1.5 text-sm font-normal">  Sign Up </button>
       </div>
 
     </nav>

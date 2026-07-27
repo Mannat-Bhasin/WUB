@@ -1,2 +1,73 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+/*navbar styling*/
+.glass {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(175deg,
+            rgba(255, 255, 255, 0.09) 0%,
+            rgba(255, 255, 255, 0.04) 100%);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.28),
+        0 4px 16px rgba(0, 0, 0, 0.12);
+    transition: background 0.35s ease, box-shadow 0.35s ease;
+}
+
+.glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(170deg,
+            rgba(255, 255, 255, 0.45) 0%,
+            rgba(255, 255, 255, 0.04) 45%,
+            rgba(255, 255, 255, 0.18) 100%);
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.glass-interactive {
+    cursor: pointer;
+}
+
+.glass-interactive:hover {
+    background: linear-gradient(175deg,
+            rgba(255, 255, 255, 0.14) 0%,
+            rgba(255, 255, 255, 0.07) 100%);
+}
+
+.glass-interactive:active {
+    box-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, 0.14),
+        0 1px 2px rgba(0, 0, 0, 0.1);
+    transition-duration: 0.08s;
+}
+
+.glass-text {
+    font-family: Cormorant;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+    position: relative;
+    z-index: 4;
+    
+}
+/*landing page name carousal*/
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
