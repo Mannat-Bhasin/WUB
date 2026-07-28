@@ -1,13 +1,16 @@
 import { create } from "zustand";
 
-const usePinStore = create((set) => ({
+const usePinStore = create((set, get) => ({
   pins: [],
   favorites: [],
 
-  addPin: (name) =>
+  addPin: (name, lng, lat) => {
+    const newPin = { id: Date.now(), name, lng, lat, hasPhotos: false };
     set((state) => ({
-      pins: [...state.pins, { id: Date.now(), name, hasPhotos: false }],
-    })),
+      pins: [...state.pins, newPin],
+    }));
+    return newPin;
+  },
 
   markPinPhotosUploaded: (id) =>
     set((state) => ({
@@ -16,9 +19,12 @@ const usePinStore = create((set) => ({
       ),
     })),
 
-  addFavorite: (name) =>
+  addFavorite: (pin) =>
     set((state) => ({
-      favorites: [...state.favorites, { id: Date.now(), name }],
+      favorites: [
+        ...state.favorites,
+        { id: Date.now(), name: pin.name, lng: pin.lng, lat: pin.lat },
+      ],
     })),
 
   removeFavorite: (id) =>

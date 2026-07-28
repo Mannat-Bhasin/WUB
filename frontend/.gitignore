@@ -1,6 +1,10 @@
 #all video files
 src/assets/*.mp4
 
+#env
+.env
+.env.*
+
 # Logs
 logs
 *.log

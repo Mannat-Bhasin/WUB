@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import usePinStore from "../store/usePinStore.js";
+import usePinStore from "../store/usePinStore";
 
 function PinPopup({ pin, onClose }) {
   const navigate = useNavigate();
@@ -11,12 +11,12 @@ function PinPopup({ pin, onClose }) {
   };
 
   const handleAddToBucketList = () => {
-    addFavorite(pin.name);
+    addFavorite(pin);
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-30 ">
       <div className="bg-white p-6 rounded-lg w-72">
         <h2 className="text-lg font-bold mb-4">{pin.name}</h2>
 
