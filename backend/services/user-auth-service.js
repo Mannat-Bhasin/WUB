@@ -38,7 +38,7 @@ export const loginUser = async(userData)=>{
     
     const Exists = await findUserByEmail(userData.Email)
     if(!Exists){
-        throw new Error(" Traveller needs to SignIn first") 
+        throw new Error(" Traveller Needs to SignIn First") 
     }
      const isMatch = await bcrypt.compare(userData.Password, Exists.Password)
     

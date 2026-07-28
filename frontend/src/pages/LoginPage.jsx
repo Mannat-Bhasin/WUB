@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import ProtectedRoute from '../components/ProtectedRoute.jsx'
 
 
 const PageLogin =  ()=>{
@@ -39,20 +40,28 @@ const handleSubmit = async (e) =>{
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(formData)
         })
+
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
     
-        const data = await response.json()
+        
 
         if(!response.ok){
+          setToast({message: "Failed to Get a Good Response", type: 'error'})
             throw new Error(data.message )
-            setToast({message: "Failed to Get a Good Response", type: 'error'})
+            
         }
 
         setToast({message: "Login Successfully Done", type: 'success'})
-        setTimeout(()=>{navigate('/Home')},1500)
+        setTimeout(()=>{navigate('/home')},1500)
 
 } catch (err) {
         setToast({message: err.message, type: 'error'})
-        setTimeout(()=>{navigate('/login')},1500)
+      
+    setFormData({
+        Email: "",
+        Password: "",
+    });
         
 } finally {
     setLoading(false)
@@ -60,6 +69,13 @@ const handleSubmit = async (e) =>{
 }
 
 return <>
+{toast && (
+  <div className="toast toast-top toast-end">
+    <div className={`alert ${toast.type === "error" ? "alert-error" : "alert-success"}`}>
+      <span>{toast.message}</span>
+    </div>
+  </div>
+)}
  <div className='relative h-screen w-screen overflow-hidden'>
 <img className= 'absolute inset-0 h-full w-full object-cover opacity-65 -z-10 ' src="/Signup-Bg-Img1.png" alt="BG-Image" />
 {/* <button className="glass glass-interactive glass-text absolute rounded-full px-4 py-1.5 text-sm font-normal text-xl mt-5">Hello</button> */}
@@ -71,15 +87,17 @@ return <>
   <legend className="fieldset-legend">Login</legend> */}
 <h1 className="text-3xl font-bold text-black mb-4 text-center">Log In</h1>
 
-  <label className="label text-lg  text-black">Traveller's User-name:</label>
-  <input type="name" className="input text-lg  text-black" placeholder="User-Name" />
+  {/* <label className="label text-lg  text-black">Traveller's User-name:</label>
+  <input type="name" className="input text-lg  text-black" placeholder="User-Name" /> */}
   <label className="label text-lg  text-black">Traveller's Email</label>
-  <input type="email" className="input text-lg  text-black" placeholder="Email" />
+  <input type="email" className="input text-lg  text-black" value={formData.Email}
+  onChange={handleChange} name='Email' placeholder="Email" />
 
   <label className="label text-lg  text-black">Traveller's Password</label>
-  <input type="password" className="input text-lg  text-black" placeholder="Password" />
+  <input type="password" className="input text-lg  text-black"  value={formData.Password}
+  onChange={handleChange} name="Password" placeholder="Password" />
 
-  <button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Sign In</button>
+  <button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Log In</button>
 
     {/* <p>Traveller's User Name:</p>
   <input

@@ -30,11 +30,11 @@ import {signupUser,loginUser} from '../services/user-auth-service.js'
                 ...userData
             })
         } catch (err) {
-    console.log("!!!!!!!!!! THIS IS THE REAL FILE !!!!!!!!!!")
+    
     console.log(err)
     res.status(404).json({
         success: false,
-        message: 'Failed to Login',
+        message: err.message
     })
 }
     

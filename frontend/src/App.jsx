@@ -5,14 +5,21 @@ import UploadPage from "./pages/UploadPage.jsx";
 import FavPage from "./pages/FavPage.jsx";
 import PageSignup from "./pages/SignupPage.jsx"
 import  PageLogin from "./pages/LoginPage.jsx"
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/home" element={<HomePage />} />
-      <Route path="/upload/:pinId" element={<UploadPage />} />
-      <Route path="/favorites" element={<FavPage />} />
+      <Route path="/home" element={<ProtectedRoute>
+            <HomePage />
+        </ProtectedRoute>} />
+      <Route path="/upload/:pinId" element={<ProtectedRoute>
+            <UploadPage />
+        </ProtectedRoute>} />
+      <Route path="/favorites" element={<ProtectedRoute>
+            <FavPage />
+        </ProtectedRoute>} />
       <Route path="/signup" element={<PageSignup />} />
       <Route path="/login" element={<PageLogin />} />
 

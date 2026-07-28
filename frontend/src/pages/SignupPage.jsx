@@ -43,8 +43,9 @@ const handleSubmit = async (e) =>{
         const data = await response.json()
 
         if(!response.ok){
+          setToast({message: "Failed to Get a Good Response", type: 'error'})
             throw new Error(data.message )
-            setToast({message: "Failed to Get a Good Response", type: 'error'})
+            
         }
 
         setToast({message: "Signup Successfully Done", type: 'success'})
@@ -71,13 +72,17 @@ return <>
   <legend className="fieldset-legend">Login</legend> */}
 <h1 className="text-3xl font-bold text-black mb-4 text-center">Sign Up</h1>
 
-  <label className="label text-lg  text-black">Traveller's User-name:</label>
-  <input type="name" className="input text-lg  text-black" placeholder="User-Name" />
+  <label className="label text-lg  text-black" >Traveller's User-name:</label>
+  <input type="name" className="input text-lg  text-black" value={formData.Name}
+  onChange={handleChange} name='Name' placeholder="User-Name" />
+  
   <label className="label text-lg  text-black">Traveller's Email</label>
-  <input type="email" className="input text-lg  text-black" placeholder="Email" />
+  <input type="email" className="input text-lg  text-black" value={formData.Email}
+  onChange={handleChange} placeholder="Email" name='Email' />
 
   <label className="label text-lg  text-black">Traveller's Password</label>
-  <input type="password" className="input text-lg  text-black" placeholder="Password" />
+  <input type="password" className="input text-lg  text-black" value={formData.Password}
+  onChange={handleChange} name='Password' placeholder="Password" />
 
   <button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Sign In</button>
 
