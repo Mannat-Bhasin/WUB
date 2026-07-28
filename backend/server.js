@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import authRoutes from './routes/user-auth-routes.js'
 // import profileRoutes from './routes/profileRoutes.js'
 // import connectionRoutes from './routes/connectionRoutes.js'
+console.log("SERVER FILE LOADED - VERSION 2")
 const app = express()
 
 app.use(cors())
@@ -23,6 +24,8 @@ const connectDB = async()=>{
 }
 
 connectDB();
+
+
 
 
 app.use('/api/auth', authRoutes)

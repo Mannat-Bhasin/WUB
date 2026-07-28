@@ -1,6 +1,7 @@
 
 import { findUserByEmail, createUser } from "../repositories/user-repo.js";
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 export const signupUser = async(userData)=>{
     const signedIn = await findUserByEmail(userData.Email)
     if(signedIn){
@@ -34,6 +35,7 @@ const calculateAge = (dob) => {
 
 
 export const loginUser = async(userData)=>{
+    
     const Exists = await findUserByEmail(userData.Email)
     if(!Exists){
         throw new Error(" Traveller needs to SignIn first") 
@@ -43,6 +45,8 @@ export const loginUser = async(userData)=>{
         if(!isMatch){
             throw new Error("Invalid email or password")
         }
+     console.log("JWT_SECRET:", process.env.JWT_SECRET)
+     const token = await jwt.sign({userId: Exists._id},process.env.JWT_SECRET, {expiresIn: '24h'})    
     
-     return {userId: Exists._id, Username:Exists.Name, Email: Exists.Email, Bio: Exists.Bio, Gender: Exists.Gender, ProfileImg: Exists.Profileimage, Age: calculateAge(Exists.DOB), Dob: Exists.DOB}
+     return {token, userId: Exists._id, Username:Exists.Name, Email: Exists.Email, Bio: Exists.Bio, Gender: Exists.Gender, ProfileImg: Exists.Profileimage, Age: calculateAge(Exists.DOB), Dob: Exists.DOB}
 }

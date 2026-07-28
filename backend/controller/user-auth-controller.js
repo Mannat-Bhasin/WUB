@@ -26,13 +26,16 @@ import {signupUser,loginUser} from '../services/user-auth-service.js'
             res.status(200).json({
                 success: true,
                 message: 'Traveller loggedin succesfully',
+                
                 ...userData
             })
         } catch (err) {
-            res.status(404).json({
-                success: false,
-                message: 'Failed to Login',
-            })
-        }
+    console.log("!!!!!!!!!! THIS IS THE REAL FILE !!!!!!!!!!")
+    console.log(err)
+    res.status(404).json({
+        success: false,
+        message: 'Failed to Login',
+    })
+}
     
     }
