@@ -4,6 +4,7 @@ import ProtectedRoute from '../components/ProtectedRoute.jsx'
 
 
 const PageLogin =  ()=>{
+  const [showPassword, setShowPassword] = useState(false);
 const navigate = useNavigate()
 const[loading, setLoading] = useState(false)
 const[formData, setFormData] = useState({
@@ -94,8 +95,11 @@ return <>
   onChange={handleChange} name='Email' placeholder="Email" />
 
   <label className="label text-lg  text-black">Traveller's Password</label>
-  <input type="password" className="input text-lg  text-black"  value={formData.Password}
-  onChange={handleChange} name="Password" placeholder="Password" />
+  <div className="join">
+    <input type={showPassword ? "text" : "password"} className="input text-lg  text-black join-item" placeholder="Password" value={formData.Password}
+  onChange={handleChange} name="Password" />
+    <button className="btn join-item" onClick={() => setShowPassword(!showPassword)}>Show </button>
+  </div>
 
   <button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Log In</button>
 

@@ -61,6 +61,13 @@ const handleSubmit = async (e) =>{
 }
 
 return <>
+{toast && (
+  <div className="toast toast-top toast-end">
+    <div className={`alert ${toast.type === "error" ? "alert-error" : "alert-success"}`}>
+      <span>{toast.message}</span>
+    </div>
+  </div>
+)}
  <div className='relative h-screen w-screen overflow-hidden'>
 <img className= 'absolute inset-0 h-full w-full object-cover opacity-65 -z-10 ' src="/Signup-Bg-Img1.png" alt="BG-Image" />
 {/* <button className="glass glass-interactive glass-text absolute rounded-full px-4 py-1.5 text-sm font-normal text-xl mt-5">Hello</button> */}
@@ -75,7 +82,7 @@ return <>
   <label className="label text-lg  text-black" >Traveller's User-name:</label>
   <input type="name" className="input text-lg  text-black" value={formData.Name}
   onChange={handleChange} name='Name' placeholder="User-Name" />
-  
+
   <label className="label text-lg  text-black">Traveller's Email</label>
   <input type="email" className="input text-lg  text-black" value={formData.Email}
   onChange={handleChange} placeholder="Email" name='Email' />
