@@ -66,57 +66,110 @@ function HomePage() {
   }, []);
 
   const handleSearch = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!query.trim()) return;
+  if (!query.trim()) return;
 
-    const place = query.trim();
+  const place = query.trim();
 
-    try {
-      const res = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          place
-        )}.json?access_token=${MAPBOX_TOKEN}&limit=1&types=country,region,place`
-      );
+  try {
+    const res = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+        place
+      )}.json?access_token=${MAPBOX_TOKEN}&limit=1&types=country,region,place`
+    );
 
-      const data = await res.json();
-      const feature = data.features?.[0];
+    const data = await res.json();
+    const feature = data.features?.[0];
 
-      if (!feature || feature.relevance < 0.6) {
-        alert("Place not found. Try another search.");
-        return;
-      }
-
-      const [lng, lat] = feature.center;
-      const map = mapRef.current;
-
-      map.flyTo({
-        center: [lng, lat],
-        zoom: 5,
-        duration: 2500,
-        essential: true,
-      });
-
-      if (markerRef.current) markerRef.current.remove();
-
-      markerRef.current = new mapboxgl.Marker({
-        color: "#e11d48",
-      })
-        .setLngLat([lng, lat])
-        .addTo(map);
-
-      const newPin = addPin(place, lng, lat);
-
-      map.once("moveend", () => {
-        setActivePin(newPin);
-      });
-
-      setQuery("");
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong while searching.");
+    if (!feature || feature.relevance < 0.6) {
+      alert("Place not found. Try another search.");
+      return;
     }
-  };
+
+    const [lng, lat] = feature.center;
+    const map = mapRef.current;
+
+    map.flyTo({
+      center: [lng, lat],
+      zoom: 5,
+      duration: 2500,
+      essential: true,
+    });
+
+    if (markerRef.current) markerRef.current.remove();
+
+    markerRef.current = new mapboxgl.Marker({
+      color: "#e11d48",
+    })
+      .setLngLat([lng, lat])
+      .addTo(map);
+
+    const newPin = await addPin(place, lng, lat); // added await
+
+    map.once("moveend", () => {
+      setActivePin(newPin);
+    });
+
+    setQuery("");
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong while searching.");
+  }
+};
+
+  // const handleSearch = async (e) => {
+  //   e.preventDefault();
+
+  //   if (!query.trim()) return;
+
+  //   const place = query.trim();
+
+  //   try {
+  //     const res = await fetch(
+  //       `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+  //         place
+  //       )}.json?access_token=${MAPBOX_TOKEN}&limit=1&types=country,region,place`
+  //     );
+
+  //     const data = await res.json();
+  //     const feature = data.features?.[0];
+
+  //     if (!feature || feature.relevance < 0.6) {
+  //       alert("Place not found. Try another search.");
+  //       return;
+  //     }
+
+  //     const [lng, lat] = feature.center;
+  //     const map = mapRef.current;
+
+  //     map.flyTo({
+  //       center: [lng, lat],
+  //       zoom: 5,
+  //       duration: 2500,
+  //       essential: true,
+  //     });
+
+  //     if (markerRef.current) markerRef.current.remove();
+
+  //     markerRef.current = new mapboxgl.Marker({
+  //       color: "#e11d48",
+  //     })
+  //       .setLngLat([lng, lat])
+  //       .addTo(map);
+
+  //     const newPin = addPin(place, lng, lat);
+
+  //     map.once("moveend", () => {
+  //       setActivePin(newPin);
+  //     });
+
+  //     setQuery("");
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Something went wrong while searching.");
+  //   }
+  // };
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">

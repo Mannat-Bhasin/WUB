@@ -7,7 +7,7 @@ function PinPopup({ pin, onClose }) {
 
   const handleUpload = () => {
     onClose();
-    navigate(`/upload/${pin.id}`);
+    navigate(`/upload/${pin._id}`);
   };
 
   const handleAddToBucketList = () => {
