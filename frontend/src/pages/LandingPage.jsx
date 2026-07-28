@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import LandingNavbar from "../components/LandingNavbar";
 import LoginPopup from "../components/LoginPopup";
 import SignupPopup from "../components/SignupPopup";
+import { useNavigate } from 'react-router-dom'
 
 import landingVideo from "../assets/landing-page-bgvideo.mp4";
 
 function LandingPage() {
-  const [showLogin, setShowLogin] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
-
+  
+  const navigate = useNavigate()
   //names carousal
   const countries = ["Japan", "India", "Iceland", "Peru", "Italy"];
   const [index, setIndex] = useState(0);
@@ -20,8 +20,6 @@ function LandingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  //login and signin popups design
-  const panelOpen = showLogin || showSignup;
 
   return (
     <div className="relative h-screen overflow-hidden">
@@ -31,10 +29,10 @@ function LandingPage() {
       </video>
 
 
-      {!panelOpen && (
-        <>
+      
           <div className="relative top-0 left-0 w-full z-10">
-            <LandingNavbar onLoginClick={() => setShowLogin(true)} onSignupClick={() => setShowSignup(true)} />
+            <LandingNavbar onLoginClick={() => navigate('/login')} 
+          onSignupClick={() => navigate('/signup')} />
           </div>
 
           <div className="relative z-10 flex flex-col items-start mt-20 pl-8 md:pl-16 h-full">
@@ -50,17 +48,13 @@ function LandingPage() {
             <button className="glass glass-interactive glass-text rounded-full px-4 py-1.5 font-normal text-xl mt-5" onClick={() => setShowSignup(true)}> Get Started
             </button>
           </div>
-        </>
+        
 
-      )};
-
-      {showLogin && <LoginPopup onClose={() => setShowLogin(false)} onSwitch={() => { setShowLogin(false); setShowSignup(true); }} />}
-      {showSignup && <SignupPopup onClose={() => setShowSignup(false)} onSwitch={() => { setShowSignup(false); setShowLogin(true); }} />}
+      
     </div>
   );
 }
 
 export default LandingPage;
-
 
 

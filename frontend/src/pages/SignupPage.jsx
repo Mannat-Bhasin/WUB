@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 
 const PageSignup =  ()=>{
+  const [showPassword, setShowPassword] = useState(false);
 const navigate = useNavigate()
 const[loading, setLoading] = useState(false)
 const[formData, setFormData] = useState({
@@ -88,24 +89,22 @@ return <>
   onChange={handleChange} placeholder="Email" name='Email' />
 
   <label className="label text-lg  text-black">Traveller's Password</label>
-  <input type="password" className="input text-lg  text-black" value={formData.Password}
-  onChange={handleChange} name='Password' placeholder="Password" />
-
-  <button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Sign In</button>
-
-    {/* <p>Traveller's User Name:</p>
-  <input
-    type="text"
-    className="border rounded px-2 py-1"
-  />
-<button className=" bg-blue-500 text-white px-4 py-2 rounded w-35" onClick={handleSubmit}>
-  Sign Up
-</button> */}
-
+  <div className="join">
+    <input type={showPassword ? "text" : "password"} className="input text-lg  text-black join-item" placeholder="Password" value={formData.Password}
+  onChange={handleChange} name="Password" />
+    <button className="btn join-item" onClick={() => setShowPassword(!showPassword)}>Show </button>
+ </div>
+  <button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Sign Up</button>
+   
+  
+  <div className='flex flex-col justify-center items-center mt-5'>
+<p className='text-2xl text-black font-bold '>Already a Traveller?</p>
+<button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Log In</button>
+</div>
 </fieldset>
-</div>
-</div>
 
+</div>
+</div>
 </>
 
 

@@ -80,12 +80,13 @@ return <>
  <div className='relative h-screen w-screen overflow-hidden'>
 <img className= 'absolute inset-0 h-full w-full object-cover opacity-65 -z-10 ' src="/Signup-Bg-Img1.png" alt="BG-Image" />
 {/* <button className="glass glass-interactive glass-text absolute rounded-full px-4 py-1.5 text-sm font-normal text-xl mt-5">Hello</button> */}
-<div className='relative flex flex-col gap-10 justify-center items-center px-0 py-1.5 font-normal w-[500px] mt-20 ml-200 z-10 '>
+<div className='relative flex flex-col gap-10 justify-center items-center  font-normal w-[500px] mt-28 ml-200  z-10 h-[65vh] '>
 
-<fieldset className='fieldset bg-base-200 border-base-300 rounded-box border p-4 glass glass-interactive glass-text h-[75vh] rounded-[15px] px-5 w-full mb-5 '>
+<fieldset className='fieldset bg-base-200 justify-center items-center border-base-300 rounded-box border p-4 glass glass-interactive glass-text h-[65vh] rounded-[15px] px-5 w-full mb-5 '>
    
 {/*     
   <legend className="fieldset-legend">Login</legend> */}
+ 
 <h1 className="text-3xl font-bold text-black mb-4 text-center">Log In</h1>
 
   {/* <label className="label text-lg  text-black">Traveller's User-name:</label>
@@ -99,21 +100,18 @@ return <>
     <input type={showPassword ? "text" : "password"} className="input text-lg  text-black join-item" placeholder="Password" value={formData.Password}
   onChange={handleChange} name="Password" />
     <button className="btn join-item" onClick={() => setShowPassword(!showPassword)}>Show </button>
-  </div>
-
+ </div>
   <button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Log In</button>
-
-    {/* <p>Traveller's User Name:</p>
-  <input
-    type="text"
-    className="border rounded px-2 py-1"
-  />
-<button className=" bg-blue-500 text-white px-4 py-2 rounded w-35" onClick={handleSubmit}>
-  Sign Up
-</button> */}
-
-</fieldset>
+   
+  
+  <div className='flex flex-col justify-center items-center mt-5'>
+<p className='text-2xl text-black font-bold '>Not Registered Yet?</p>
+<button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Sign Up</button>
 </div>
+</fieldset>
+
+</div>
+
 </div>
 
 </>
