@@ -1,7 +1,7 @@
 import { useState } from "react";
-import DashboardNavbar from "../components/DashboardNavbar";
-import PinPopup from "../components/PinPopup";
-import usePinStore from "../store/usePinStore";
+import DashboardNavbar from "../components/DashboardNavbar.jsx";
+import PinPopup from "../components/PinPopup.jsx";
+import usePinStore from "../store/usePinStore.js";
 
 function HomePage() {
   const [query, setQuery] = useState("");

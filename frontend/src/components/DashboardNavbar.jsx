@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import usePinStore from "../store/usePinStore";
+import usePinStore from "../store/usePinStore.js";
 
 function DashboardNavbar() {
   const favorites = usePinStore((state) => state.favorites);

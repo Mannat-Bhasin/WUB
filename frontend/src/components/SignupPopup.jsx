@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "../store/useAuthStore";
+import useAuthStore from "../store/useAuthStore.js";
 
 function SignupPopup({ onClose }) {
   const [name, setName] = useState("");

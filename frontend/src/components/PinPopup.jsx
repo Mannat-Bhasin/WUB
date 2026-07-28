@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import usePinStore from "../store/usePinStore";
+import usePinStore from "../store/usePinStore.js";
 
 function PinPopup({ pin, onClose }) {
   const navigate = useNavigate();

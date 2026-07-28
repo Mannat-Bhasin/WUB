@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import usePinStore from "../store/usePinStore";
+import usePinStore from "../store/usePinStore.js";
 
 function FavPage() {
   const favorites = usePinStore((state) => state.favorites);

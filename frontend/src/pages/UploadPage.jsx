@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import usePinStore from "../store/usePinStore";
+import usePinStore from "../store/usePinStore.js";
 
 function UploadPage() {
   const { pinId } = useParams();
