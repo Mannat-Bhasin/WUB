@@ -3,6 +3,7 @@ import cors from 'cors'
 import 'dotenv/config'
 import mongoose from 'mongoose'
 import authRoutes from './routes/user-auth-routes.js'
+import pinRoutes from './routes/pin-routes.js'
 // import profileRoutes from './routes/profileRoutes.js'
 // import connectionRoutes from './routes/connectionRoutes.js'
 console.log("SERVER FILE LOADED - VERSION 2")
@@ -31,6 +32,9 @@ connectDB();
 app.use('/api/auth', authRoutes)
 // app.use('/api/profile', profileRoutes)
 // app.use('/api/connections', connectionRoutes)
+
+app.use('/api/pins', pinRoutes)
+
 const PORT = process.env.PORT
 
 app.listen(PORT, ()=>{

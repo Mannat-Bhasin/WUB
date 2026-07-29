@@ -103,9 +103,9 @@ function FavPage() {
       map.once("style.load", plot);
     }
   }, [favorites]);
-
-  const handleRemove = () => {
-    removeFavorite(activeFav.id);
+  
+  const handleRemove = async () => {
+    await removeFavorite(activeFav._id);
     setActiveFav(null);
   };
 

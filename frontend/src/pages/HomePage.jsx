@@ -22,7 +22,8 @@ function HomePage() {
 
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
-  const markersRef = useRef([]); // { pinId, marker }
+  const markersRef = useRef([]); // { pinId, marker } — only pins searched THIS visit
+  const mapLoadedRef = useRef(false);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -56,52 +57,37 @@ function HomePage() {
           map.setLayoutProperty(layer.id, "visibility", "none");
         }
       });
+
+      mapLoadedRef.current = true;
+      // deliberately NOT plotting existing pins here — this page always starts blank
     });
 
     mapRef.current = map;
 
-    return () => map.remove();
+    return () => {
+      map.remove();
+      mapLoadedRef.current = false;
+      markersRef.current = [];
+    };
   }, []);
 
-  // Keep markers on the globe in sync with pins, and make each one clickable
-  useEffect(() => {
+  const dropMarker = (pin) => {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map || !mapLoadedRef.current) return;
 
-    const plot = () => {
-      const existingIds = markersRef.current.map((m) => m.pinId);
-      const currentIds = pins.map((p) => p.id);
+    // clear any previously dropped marker(s) — only one pin visible at a time
+    markersRef.current.forEach((m) => m.marker.remove());
+    markersRef.current = [];
 
-      // remove markers for pins that no longer exist
-      markersRef.current = markersRef.current.filter((m) => {
-        if (!currentIds.includes(m.pinId)) {
-          m.marker.remove();
-          return false;
-        }
-        return true;
-      });
+    const marker = new mapboxgl.Marker({ color: "#e11d48" })
+      .setLngLat([pin.lng, pin.lat])
+      .addTo(map);
 
-      // add markers for new pins only
-      pins.forEach((pin) => {
-        if (existingIds.includes(pin.id)) return;
+    marker.getElement().style.cursor = "pointer";
+    marker.getElement().addEventListener("click", () => setActivePin(pin));
 
-        const marker = new mapboxgl.Marker({ color: "#e11d48" })
-          .setLngLat([pin.lng, pin.lat])
-          .addTo(map);
-
-        marker.getElement().style.cursor = "pointer";
-        marker.getElement().addEventListener("click", () => setActivePin(pin));
-
-        markersRef.current.push({ pinId: pin.id, marker });
-      });
-    };
-
-    if (map.isStyleLoaded()) {
-      plot();
-    } else {
-      map.once("style.load", plot);
-    }
-  }, [pins]);
+    markersRef.current.push({ pinId: pin._id, marker });
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -136,10 +122,24 @@ function HomePage() {
         essential: true,
       });
 
-      const newPin = addPin(place, lng, lat);
+      // reuse the existing DB pin if this place was already searched before (any past visit)
+      const existingPin = pins.find(
+        (p) => p.name.toLowerCase() === place.toLowerCase()
+      );
+
+      let targetPin = existingPin;
+      if (!targetPin) {
+        targetPin = await addPin(place, lng, lat);
+        if (!targetPin) {
+          setSearchError("Failed to save pin. Try again.");
+          return;
+        }
+      }
+
+      dropMarker(targetPin);
 
       map.once("moveend", () => {
-        setActivePin(newPin);
+        setActivePin(targetPin);
       });
 
       setQuery("");
@@ -151,7 +151,6 @@ function HomePage() {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
-
       {/* Background Globe */}
       <div ref={mapContainerRef} className="fixed top-0 left-0 w-screen h-screen z-0" />
 
