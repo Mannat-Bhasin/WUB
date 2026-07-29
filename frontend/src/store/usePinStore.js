@@ -6,13 +6,7 @@ const usePinStore = create((set, get) => ({
   favorites: [],
   photos: [],
 
-  // addPin: (name, lng, lat) => {
-  //   const newPin = { id: Date.now(), name, lng, lat, hasPhotos: false };
-  //   set((state) => ({
-  //     pins: [...state.pins, newPin],
-  //   }));
-  //   return newPin;
-  // },
+ 
  
 fetchPins: async (userId) => {
   console.log("User ID:", userId);
@@ -29,7 +23,7 @@ fetchPins: async (userId) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, lng, lat, userId }),
     });
-    const newPin = await res.json(); // real doc with _id from MongoDB
+    const newPin = await res.json(); 
     set((state) => ({ pins: [...state.pins, newPin] }));
     return newPin;
   },
@@ -60,45 +54,7 @@ fetchPins: async (userId) => {
   return urls;
 },
 
-//   addPhotosToPin: async (id, files) => {
-//   const formData = new FormData();
-//   files.forEach((file) => formData.append("photos", file));
 
-//   const res = await fetch(`${API}/${id}/photos`, {
-//     method: "POST",
-//     body: formData,
-//   });
-//   const { url } = await res.json();
-
-// set((state) => ({
-//   pins: state.pins.map((pin) =>
-//     pin._id === id
-//       ? {
-//           ...pin,
-//           hasPhotos: true,
-//           photos: url
-//         }
-//       : pin
-//   ),
-// }));
-
-// return url,
-// {
-//   "url": [
-//     ...url,"",
-//   ]
-// };
-
-//   const { urls } = await res.json();
-
-//   set((state) => ({
-//     pins: state.pins.map((pin) =>
-//       pin._id === id ? { ...pin, hasPhotos: true } : pin   // ← this is the same flag flip
-//     ),
-//   }));
-
-//   return urls;
-// },
 
 
 

@@ -45,7 +45,7 @@ function LandingPage() {
               turn it into a living map you can revisit anytime. No more scrolling
               through endless folders, just pin it, and it's yours forever.
             </p>
-            <button className="glass glass-interactive glass-text rounded-full px-4 py-1.5 font-normal text-xl mt-5" onClick={() => setShowSignup(true)}> Get Started
+            <button className="glass glass-interactive glass-text rounded-full px-4 py-1.5 font-normal text-xl mt-5" onClick={() => navigate('/signup')}> Get Started
             </button>
           </div>
         
