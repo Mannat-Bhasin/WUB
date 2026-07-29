@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom'
 
 const PageSignup =  ()=>{
   const [showPassword, setShowPassword] = useState(false);
-const navigate = useNavigate()
-const[loading, setLoading] = useState(false)
-const[formData, setFormData] = useState({
+  const navigate = useNavigate()
+  const[loading, setLoading] = useState(false)
+  const[formData, setFormData] = useState({
     Name: '',
     Email: '',
     Password: ''
-})
-const[toast, setToast] = useState(null)
+  })
+  const[toast, setToast] = useState(null)
 
 useEffect(()=>{
 if(toast){

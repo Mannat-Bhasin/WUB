@@ -106,7 +106,6 @@ padding:0;}
 /*dashboard navbar styling*/
 .glass-dashboard{
   position: relative;
-    
     background: linear-gradient(175deg,
             rgba(255, 255, 255, 0.09) 0%,
             rgba(255, 255, 255, 0.04) 100%);
@@ -117,6 +116,25 @@ padding:0;}
         0 4px 16px rgba(0, 0, 0, 0.12);
     transition: background 0.35s ease, box-shadow 0.35s ease;
    
+}
+
+.glass-pinpopup{
+    background: linear-gradient(175deg,
+            rgba(255, 255, 255, 0.09) 0%,
+            rgba(255, 255, 255, 0.04) 100%);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.28),
+        0 4px 16px rgba(0, 0, 0, 0.12);
+}
+/*search button*/
+@supports (color: color-mix(in lab, red, red)) {
+    .btn {
+        --btn-shadow: 0 -2px 2px -2px
+ color-mix(in oklab, var(--btn-bg) calc(var(--depth) * 30%), #0000), 0 4px 3px -2px
+ color-mix(in oklab, var(--btn-bg) calc(var(--depth) * 30%), #0000);
+    }
 }
 /*globe*/
 /* Force Mapbox behind UI */

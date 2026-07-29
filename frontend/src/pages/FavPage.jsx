@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardNavbar from "../components/DashboardNavbar";
 import usePinStore from "../store/usePinStore";
+
+//map
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -19,7 +21,7 @@ function FavPage() {
 
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
-  const markersRef = useRef([]);
+  const markersRef = useRef([]); // { favId, marker }
 
   // init globe once
   useEffect(() => {
@@ -28,7 +30,13 @@ function FavPage() {
       style: MAPBOX_STYLE,
       projection: "globe",
       zoom: 1.5,
-      center: [0, 20],
+      center: [0, 5],
+      padding: {
+        top: 170,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      },
     });
 
     map.on("style.load", () => {
@@ -48,19 +56,30 @@ function FavPage() {
     return () => map.remove();
   }, []);
 
-  // re-plot pink markers whenever favorites changes
+  // keep markers in sync with favorites, click opens remove popup
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     const plot = () => {
-      // clear old markers
-      markersRef.current.forEach((m) => m.remove());
-      markersRef.current = [];
+      const existingIds = markersRef.current.map((m) => m.favId);
+      const currentIds = favorites.map((f) => f.id);
 
+      // remove markers for favorites that no longer exist
+      markersRef.current = markersRef.current.filter((m) => {
+        if (!currentIds.includes(m.favId)) {
+          m.marker.remove();
+          return false;
+        }
+        return true;
+      });
+
+      // add markers for new favorites only
       const validFavs = favorites.filter((f) => f.lng != null && f.lat != null);
 
       validFavs.forEach((fav) => {
+        if (existingIds.includes(fav.id)) return;
+
         const marker = new mapboxgl.Marker({ color: "#ec4899" }) // pink-500
           .setLngLat([fav.lng, fav.lat])
           .addTo(map);
@@ -68,7 +87,7 @@ function FavPage() {
         marker.getElement().style.cursor = "pointer";
         marker.getElement().addEventListener("click", () => setActiveFav(fav));
 
-        markersRef.current.push(marker);
+        markersRef.current.push({ favId: fav.id, marker });
       });
 
       if (validFavs.length > 0) {
@@ -91,27 +110,16 @@ function FavPage() {
   };
 
   return (
-    <div>
-      <DashboardNavbar />
+    <div className="relative h-screen w-screen overflow-hidden">
 
-      <div className="p-4">
-        <button className="btn btn-ghost mb-4" onClick={() => navigate("/home")}> Go Back </button>
+      {/* Background Globe */}
+      <div ref={mapContainerRef} className="fixed top-0 left-0 w-screen h-screen z-0" />
 
-        <h1 className="text-xl font-bold mb-4">Your Wishlist Map</h1>
+      {/* Navbar */}
+      <div className="absolute top-0 left-0 w-full z-50 px-6"><DashboardNavbar /> </div>
 
-        <div ref={mapContainerRef} className="w-full h-96 rounded-lg overflow-hidden" />
-
-        <div className="flex flex-wrap gap-2 mt-4">
-          {favorites.map((fav) => (
-            <button
-              key={fav.id}
-              onClick={() => setActiveFav(fav)}
-              className="btn btn-sm btn-info"
-            >
-              {fav.name}
-            </button>
-          ))}
-        </div>
+      <div className="p-4 absolute bottom-5 left-300 z-50 px-6">
+        <button className="btn bg-[#3d3939] text-white border-none hover:bg-[#282929] mb-4" onClick={() => navigate("/home")}> Go Back </button>
       </div>
 
       {activeFav && (

@@ -39,6 +39,9 @@ app.use('/api/auth', authRoutes)
 app.use('/api/pins', pinRoutes)
 // app.use('/api/profile', profileRoutes)
 // app.use('/api/connections', connectionRoutes)
+
+app.use('/api/pins', pinRoutes)
+
 const PORT = process.env.PORT
 
 app.listen(PORT, ()=>{

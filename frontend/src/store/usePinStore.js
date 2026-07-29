@@ -1,5 +1,12 @@
 import { create } from "zustand";
-const API = "http://localhost:5000/api/pins";
+
+const API_BASE = "http://localhost:5000/api";
+
+const authHeaders = (isJson = true) => {
+  const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+  if (isJson) headers["Content-Type"] = "application/json";
+  return headers;
+};
 
 const usePinStore = create((set, get) => ({
   pins: [],
@@ -33,12 +40,44 @@ fetchPins: async (userId) => {
 
   files.forEach((file) => formData.append("photos", file));
 
-  const res = await fetch(`${API}/${id}/photos`, {
-    method: "POST",
-    body: formData,
-  });
+  addFavorite: async (pin) => {
+    if (pin.isFavorite) return false;
+    try {
+      const res = await fetch(`${API_BASE}/pins/${pin._id}/favorite`, {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({ isFavorite: true }),
+      });
+      if (!res.ok) throw new Error("Failed to add favorite");
+      const updated = await res.json();
+      set((state) => ({
+        pins: state.pins.map((p) => (p._id === updated._id ? updated : p)),
+        favorites: [...state.favorites, updated],
+      }));
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  },
 
-  const { urls } = await res.json();
+  removeFavorite: async (id) => {
+    try {
+      const res = await fetch(`${API_BASE}/pins/${id}/favorite`, {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({ isFavorite: false }),
+      });
+      if (!res.ok) throw new Error("Failed to remove favorite");
+      const updated = await res.json();
+      set((state) => ({
+        pins: state.pins.map((p) => (p._id === updated._id ? updated : p)),
+        favorites: state.favorites.filter((f) => f._id !== id),
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  },
 
   set((state) => ({
     pins: state.pins.map((pin) =>
@@ -65,32 +104,29 @@ updatePinDescription: async (id, description) => {
     body: JSON.stringify({ description }),
   });
 
-  if (!res.ok) throw new Error("Failed to save description");
-
-  const updatedPin = await res.json();
-
-  set((state) => ({
-    pins: state.pins.map((pin) =>
-      pin._id === id ? updatedPin : pin
-    ),
-  }));
-
-  return updatedPin;
-},
-
- 
-  addFavorite: (pin) =>
     set((state) => ({
-      favorites: [
-        ...state.favorites,
-        { id: Date.now(), name: pin.name, lng: pin.lng, lat: pin.lat },
-      ],
-    })),
+      pins: state.pins.map((p) => (p._id === updated._id ? updated : p)),
+      favorites: state.favorites.filter((f) => f._id !== updated._id), // no longer a favorite once photographed
+    }));
+    return updated;
+  },
 
-  removeFavorite: (id) =>
+  updatePinDescription: async (pinId, description) => {
+    const res = await fetch(`${API_BASE}/pins/${pinId}/description`, {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify({ description }),
+    });
+    if (!res.ok) throw new Error("Failed to update description");
+    const updated = await res.json();
     set((state) => ({
-      favorites: state.favorites.filter((fav) => fav.id !== id),
-    })),
+      pins: state.pins.map((p) => (p._id === updated._id ? updated : p)),
+      favorites: state.favorites.map((f) => (f._id === updated._id ? updated : f)),
+    }));
+    return updated;
+  },
+
+  clearPins: () => set({ pins: [], favorites: [], pinsLoaded: false }),
 }));
 
 export default usePinStore;
