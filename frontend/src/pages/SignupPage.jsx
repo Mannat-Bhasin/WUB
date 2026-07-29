@@ -28,6 +28,17 @@ const handleChange = (e)=>{
     setFormData({...formData, [e.target.name]:e.target.value})
 }
 
+const handleLogIn =()=>{
+  try {
+    setLoading(true)
+    setToast({message: "Redirecting... to LogIn", type: 'success'})
+    setTimeout(()=>{navigate('/login')},1000)
+  } catch (error) {
+    setToast({message: err.message, type: 'error'})
+    
+  }
+}
+
 
 const handleSubmit = async (e) =>{
     e.preventDefault()
@@ -99,7 +110,7 @@ return <>
   
   <div className='flex flex-col justify-center items-center mt-5'>
 <p className='text-2xl text-black font-bold '>Already a Traveller?</p>
-<button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Log In</button>
+<button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleLogIn}>Log In</button>
 </div>
 </fieldset>
 

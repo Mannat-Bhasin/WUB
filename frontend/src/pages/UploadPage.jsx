@@ -1,61 +1,13 @@
-// import { useState } from "react";
-// import { useNavigate, useParams } from "react-router-dom";
-// import usePinStore from "../store/usePinStore";
-
-// function UploadPage() {
-//   const { pinId } = useParams();
-//   const navigate = useNavigate();
- 
-
-//   const [photos, setPhotos] = useState([]); // { url, caption }
-
-//   const handleFileChange = (e) => {
-//     const files = Array.from(e.target.files);
-//     const newPhotos = files.map((file) => ({
-//       // url: URL.createObjectURL(file), // local preview only, no backend yet
-//       caption: "",
-//     }));
-//     setPhotos([...photos, ...newPhotos]);
-    
-//   };
-
-//   const handleCaptionChange = (index, value) => {
-//     const updated = [...photos];
-//     updated[index].caption = value;
-//     setPhotos(updated);
-//   };
-
-//   return (
-//     <div className="p-4">
-
-//       <button className="btn btn-ghost mb-4" onClick={() => navigate("/home")}> Go Back </button>
-
-//       <input type="file" accept="image/*" multiple onChange={handleFileChange} className="mb-4" />
-
-//       <div className="flex flex-wrap gap-4">
-//         {photos.map((photo, index) => (
-//           <div key={index} className="w-40">
-//             <img src={photo.url} alt="uploaded" className="w-full rounded-lg mb-1" />
-//             <input type="text" placeholder="Caption this" value={photo.caption} onChange={(e) => handleCaptionChange(index, e.target.value)}
-//               className="input input-bordered input-sm w-full"/>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default UploadPage;
 
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import usePinStore from "../store/usePinStore";
+import usePinStore from "../store/usePinStore.js";
 
 function UploadPage() {
   const { pinId } = useParams();
   const navigate = useNavigate();
   
-const updatePinDescription = usePinStore((state) => state.updatePinDescription); // add this
+  const updatePinDescription = usePinStore((state) => state.updatePinDescription)
 
   const pins = usePinStore((state) => state.pins);
   const fetchPins = usePinStore((state) => state.fetchPins);
@@ -70,6 +22,12 @@ const updatePinDescription = usePinStore((state) => state.updatePinDescription);
   useEffect(() => {
     if (pins.length === 0) fetchPins();
   }, []);
+
+//  useEffect(() => {
+//   if (!pin) {
+//     fetchPins(); // or better: fetchSinglePin(pinId) if you build that route
+//   }
+// }, [pinId]);
 
   const pin = pins.find((p) => p._id === pinId);
 
@@ -108,7 +66,10 @@ const updatePinDescription = usePinStore((state) => state.updatePinDescription);
   }
 
   // pick up to 5 previews for the collage; fall back to placeholders
-  const collage = previews.slice(0, 5);
+  const photosToDisplay =
+  pin?.photos?.length > 0 ? pin.photos : previews;
+  const collage = previews.slice(0, 25);
+  const remaining = photosToDisplay.slice(10);
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#1F2421]">
@@ -165,7 +126,23 @@ const updatePinDescription = usePinStore((state) => state.updatePinDescription);
                   alt=""
                 />
               )}
-            </div>
+            
+            
+            {remaining.length > 0 && (
+  <div className="mt-4 max-h-80 overflow-y-auto">
+    <div className="grid grid-cols-4 gap-3">
+      {remaining.map((photo, index) => (
+        <img
+          key={index}
+          src={photo}
+          alt=""
+          className="w-full aspect-square object-cover rounded-sm"
+        />
+      ))}
+    </div>
+  </div>
+)}
+</div>
           ) : (
             <label className="flex flex-col items-center justify-center h-[420px] border border-dashed border-[#8C8577]/40 rounded-sm cursor-pointer hover:border-[#435E52] transition-colors">
               <span className="font-mono text-xs tracking-widest text-[#8C8577]">

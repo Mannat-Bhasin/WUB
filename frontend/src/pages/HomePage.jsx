@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import DashboardNavbar from "../components/DashboardNavbar";
 import PinPopup from "../components/PinPopup";
 import usePinStore from "../store/usePinStore";
-
+import useAuthStore from "../store/useAuthStore"
 // Map
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -18,9 +18,18 @@ function HomePage() {
   const [query, setQuery] = useState("");
   const [activePin, setActivePin] = useState(null);
   const [searchError, setSearchError] = useState("");
+  // const user = useAuthStore((state) => state.user);
+  const auth = useAuthStore();
+
+console.log("AUTH STORE:", auth);
+
+const user = auth.user;
+const fetchPins = usePinStore((state) => state.fetchPins);
 
   const pins = usePinStore((state) => state.pins);
   const addPin = usePinStore((state) => state.addPin);
+  
+
 
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -105,7 +114,7 @@ function HomePage() {
       .setLngLat([lng, lat])
       .addTo(map);
 
-    const newPin = await addPin(place, lng, lat); // added await
+    const newPin = await addPin(place, lng, lat, user.userId); // added await
 
     map.once("moveend", () => {
       setActivePin(newPin);
@@ -117,6 +126,30 @@ function HomePage() {
     alert("Something went wrong while searching.");
   }
 };
+console.log("yes rendering")
+
+console.log("Current user:", user);
+
+useEffect(() => {
+  console.log("useeffect User:", user);
+  if (user?.userId) {
+    console.log("Fetching pins for:", user.userId);
+    fetchPins(user.userId);   
+  }
+}, [user]);
+
+useEffect(() => {
+  if (!mapRef.current) return;
+
+  
+  pins.forEach((pin) => {
+    new mapboxgl.Marker({ color: "#e11d48" })
+      .setLngLat([pin.lng, pin.lat])
+      .addTo(mapRef.current)
+      .getElement()
+      .addEventListener("click", () => setActivePin(pin));
+  });
+}, [pins]);
 
   // const handleSearch = async (e) => {
   //   e.preventDefault();

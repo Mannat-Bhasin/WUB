@@ -3,9 +3,16 @@ import cors from 'cors'
 import 'dotenv/config'
 import mongoose from 'mongoose'
 import authRoutes from './routes/user-auth-routes.js'
+import multer from "multer";
+import pinRoutes from './routes/pin-routes.js'
+// import Pin from "./models/Pin.js";
+// import Photo from "./models/Photo.js";
 // import profileRoutes from './routes/profileRoutes.js'
 // import connectionRoutes from './routes/connectionRoutes.js'
-console.log("SERVER FILE LOADED - VERSION 2")
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err);
+});
+
 const app = express()
 
 app.use(cors())
@@ -29,6 +36,7 @@ connectDB();
 
 
 app.use('/api/auth', authRoutes)
+app.use('/api/pins', pinRoutes)
 // app.use('/api/profile', profileRoutes)
 // app.use('/api/connections', connectionRoutes)
 const PORT = process.env.PORT

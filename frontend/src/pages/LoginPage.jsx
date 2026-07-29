@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ProtectedRoute from '../components/ProtectedRoute.jsx'
+import useAuthStore from "../store/useAuthStore";
 
 
 const PageLogin =  ()=>{
@@ -13,6 +14,7 @@ const[formData, setFormData] = useState({
     Password: ''
 })
 const[toast, setToast] = useState(null)
+const login = useAuthStore((state) => state.login);
 
 useEffect(()=>{
 if(toast){
@@ -23,7 +25,17 @@ if(toast){
     return ()=>clearTimeout(timerId)
 }
 },[toast])
-
+const handleSignUp =()=>{
+  try {
+    setLoading(true)
+    setToast({message: "Redirecting... to SignUp", type: 'success'})
+    setTimeout(()=>{navigate('/signup')},1000)
+  } catch (error) {
+    setToast({message: err.message, type: 'error'})
+    
+  }
+  
+}
 
 const handleChange = (e)=>{
     setFormData({...formData, [e.target.name]:e.target.value})
@@ -32,6 +44,7 @@ const handleChange = (e)=>{
 
 const handleSubmit = async (e) =>{
     e.preventDefault()
+    console.log("handleSubmit called");
 
 
  try {   
@@ -41,20 +54,27 @@ const handleSubmit = async (e) =>{
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(formData)
         })
+console.log("Response received:", response);
+       const data = await response.json();
+       console.log("yoyoyo:" ,data)
 
-        const data = await response.json();
-        localStorage.setItem("token", data.token);
-    
-        
+if (!response.ok) {
+    throw new Error(data.message);
+}
 
-        if(!response.ok){
-          setToast({message: "Failed to Get a Good Response", type: 'error'})
-            throw new Error(data.message )
-            
-        }
+localStorage.setItem("token", data.token);
 
-        setToast({message: "Login Successfully Done", type: 'success'})
-        setTimeout(()=>{navigate('/home')},1500)
+localStorage.setItem("user", JSON.stringify(data));
+
+login(data);
+console.log("After login:", useAuthStore.getState());
+console.log("Called login()");
+setToast({
+    message: "Login Successfully Done",
+    type: "success"
+});
+
+setTimeout(() => navigate("/home"), 1500);
 
 } catch (err) {
         setToast({message: err.message, type: 'error'})
@@ -81,6 +101,10 @@ return <>
 <img className= 'absolute inset-0 h-full w-full object-cover opacity-65 -z-10 ' src="/Signup-Bg-Img1.png" alt="BG-Image" />
 {/* <button className="glass glass-interactive glass-text absolute rounded-full px-4 py-1.5 text-sm font-normal text-xl mt-5">Hello</button> */}
 <div className='relative flex flex-col gap-10 justify-center items-center  font-normal w-[500px] mt-28 ml-200  z-10 h-[65vh] '>
+  <form
+  onSubmit={handleSubmit}
+  className="fieldset bg-base-200 justify-center items-center border-base-300 rounded-box border p-4 glass glass-interactive glass-text h-[65vh] rounded-[15px] px-5 w-full mb-5"
+>
 
 <fieldset className='fieldset bg-base-200 justify-center items-center border-base-300 rounded-box border p-4 glass glass-interactive glass-text h-[65vh] rounded-[15px] px-5 w-full mb-5 '>
    
@@ -101,14 +125,17 @@ return <>
   onChange={handleChange} name="Password" />
     <button className="btn join-item" onClick={() => setShowPassword(!showPassword)}>Show </button>
  </div>
-  <button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Log In</button>
+  <button type="submit" className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Log In</button>
    
   
   <div className='flex flex-col justify-center items-center mt-5'>
 <p className='text-2xl text-black font-bold '>Not Registered Yet?</p>
-<button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSubmit}>Sign Up</button>
+<button className="bg-blue-500 text-white  text-lg px-4 py-2 rounded w-35 mt-4" onClick={handleSignUp}>Sign Up</button>
+
 </div>
 </fieldset>
+   </form>
+
 
 </div>
 
