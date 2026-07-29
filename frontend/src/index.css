@@ -118,6 +118,14 @@ padding:0;}
     transition: background 0.35s ease, box-shadow 0.35s ease;
    
 }
+/*search button*/
+@supports (color: color-mix(in lab, red, red)) {
+    .btn {
+        --btn-shadow: 0 -2px 2px -2px
+ color-mix(in oklab, var(--btn-bg) calc(var(--depth) * 30%), #0000), 0 4px 3px -2px
+ color-mix(in oklab, var(--btn-bg) calc(var(--depth) * 30%), #0000);
+    }
+}
 /*globe*/
 /* Force Mapbox behind UI */
 .mapboxgl-map {

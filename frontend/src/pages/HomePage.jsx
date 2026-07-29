@@ -8,9 +8,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
-
-const MAPBOX_STYLE =
-  "mapbox://styles/riyaaagarg/cms4dk4p200ty01qk3ecgdkj4";
+const MAPBOX_STYLE = "mapbox://styles/riyaaagarg/cms4dk4p200ty01qk3ecgdkj4";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -24,7 +22,7 @@ function HomePage() {
 
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
-  const markerRef = useRef(null);
+  const markersRef = useRef([]); // { pinId, marker }
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -32,9 +30,9 @@ function HomePage() {
       style: MAPBOX_STYLE,
       projection: "globe",
       zoom: 1.5,
-      center: [0, 5], // move globe slightly downward
+      center: [0, 5],
       padding: {
-        top: 170, // keeps globe below navbar
+        top: 170,
         left: 0,
         right: 0,
         bottom: 0,
@@ -65,117 +63,97 @@ function HomePage() {
     return () => map.remove();
   }, []);
 
-  const handleSearch = async (e) => {
-  e.preventDefault();
-
-  if (!query.trim()) return;
-
-  const place = query.trim();
-
-  try {
-    const res = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        place
-      )}.json?access_token=${MAPBOX_TOKEN}&limit=1&types=country,region,place`
-    );
-
-    const data = await res.json();
-    const feature = data.features?.[0];
-
-    if (!feature || feature.relevance < 0.6) {
-      alert("Place not found. Try another search.");
-      return;
-    }
-
-    const [lng, lat] = feature.center;
+  // Keep markers on the globe in sync with pins, and make each one clickable
+  useEffect(() => {
     const map = mapRef.current;
+    if (!map) return;
 
-    map.flyTo({
-      center: [lng, lat],
-      zoom: 5,
-      duration: 2500,
-      essential: true,
-    });
+    const plot = () => {
+      const existingIds = markersRef.current.map((m) => m.pinId);
+      const currentIds = pins.map((p) => p.id);
 
-    if (markerRef.current) markerRef.current.remove();
+      // remove markers for pins that no longer exist
+      markersRef.current = markersRef.current.filter((m) => {
+        if (!currentIds.includes(m.pinId)) {
+          m.marker.remove();
+          return false;
+        }
+        return true;
+      });
 
-    markerRef.current = new mapboxgl.Marker({
-      color: "#e11d48",
-    })
-      .setLngLat([lng, lat])
-      .addTo(map);
+      // add markers for new pins only
+      pins.forEach((pin) => {
+        if (existingIds.includes(pin.id)) return;
 
-    const newPin = await addPin(place, lng, lat); // added await
+        const marker = new mapboxgl.Marker({ color: "#e11d48" })
+          .setLngLat([pin.lng, pin.lat])
+          .addTo(map);
 
-    map.once("moveend", () => {
-      setActivePin(newPin);
-    });
+        marker.getElement().style.cursor = "pointer";
+        marker.getElement().addEventListener("click", () => setActivePin(pin));
 
-    setQuery("");
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong while searching.");
-  }
-};
+        markersRef.current.push({ pinId: pin.id, marker });
+      });
+    };
 
-  // const handleSearch = async (e) => {
-  //   e.preventDefault();
+    if (map.isStyleLoaded()) {
+      plot();
+    } else {
+      map.once("style.load", plot);
+    }
+  }, [pins]);
 
-  //   if (!query.trim()) return;
+  const handleSearch = async (e) => {
+    e.preventDefault();
 
-  //   const place = query.trim();
+    if (!query.trim()) return;
 
-  //   try {
-  //     const res = await fetch(
-  //       `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-  //         place
-  //       )}.json?access_token=${MAPBOX_TOKEN}&limit=1&types=country,region,place`
-  //     );
+    const place = query.trim();
+    setSearchError("");
 
-  //     const data = await res.json();
-  //     const feature = data.features?.[0];
+    try {
+      const res = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+          place
+        )}.json?access_token=${MAPBOX_TOKEN}&limit=1&types=country,region,place`
+      );
 
-  //     if (!feature || feature.relevance < 0.6) {
-  //       alert("Place not found. Try another search.");
-  //       return;
-  //     }
+      const data = await res.json();
+      const feature = data.features?.[0];
 
-  //     const [lng, lat] = feature.center;
-  //     const map = mapRef.current;
+      if (!feature || feature.relevance < 0.6) {
+        setSearchError("Place not found. Try another search.");
+        return;
+      }
 
-  //     map.flyTo({
-  //       center: [lng, lat],
-  //       zoom: 5,
-  //       duration: 2500,
-  //       essential: true,
-  //     });
+      const [lng, lat] = feature.center;
+      const map = mapRef.current;
 
-  //     if (markerRef.current) markerRef.current.remove();
+      map.flyTo({
+        center: [lng, lat],
+        zoom: 5,
+        duration: 2500,
+        essential: true,
+      });
 
-  //     markerRef.current = new mapboxgl.Marker({
-  //       color: "#e11d48",
-  //     })
-  //       .setLngLat([lng, lat])
-  //       .addTo(map);
+      const newPin = addPin(place, lng, lat);
 
-  //     const newPin = addPin(place, lng, lat);
+      map.once("moveend", () => {
+        setActivePin(newPin);
+      });
 
-  //     map.once("moveend", () => {
-  //       setActivePin(newPin);
-  //     });
-
-  //     setQuery("");
-  //   } catch (err) {
-  //     console.error(err);
-  //     alert("Something went wrong while searching.");
-  //   }
-  // };
+      setQuery("");
+    } catch (err) {
+      console.error(err);
+      setSearchError("Something went wrong while searching.");
+    }
+  };
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
 
       {/* Background Globe */}
-      <div ref={mapContainerRef}   className="fixed top-0 left-0 w-screen h-screen z-0" />
+      <div ref={mapContainerRef} className="fixed top-0 left-0 w-screen h-screen z-0" />
 
       {/* Navbar */}
       <div className="absolute top-0 left-0 w-full z-50 px-6"><DashboardNavbar /> </div>
@@ -185,7 +163,7 @@ function HomePage() {
         <form onSubmit={handleSearch} className="flex gap-2 max-w-lg">
           <input type="text" placeholder="Search a place" value={query} onChange={(e) => setQuery(e.target.value)} className="input input-bordered flex-1" />
 
-          <button type="submit" className="btn bg-[#618687] text-white border-none hover:bg-[#4f7273]"> Search </button>
+          <button type="submit" className="btn bg-[#3d3939] hover:bg-[#282929] text-white border-none"> Search </button>
         </form>
 
         {searchError && (
@@ -193,19 +171,6 @@ function HomePage() {
             {searchError}
           </p>
         )}
-
-        {/* <div className="flex flex-wrap gap-2 mt-6">
-          {pins.map((pin) => (
-            <button
-              key={pin.id}
-              onClick={() => setActivePin(pin)}
-              className={`btn btn-sm ${pin.hasPhotos ? "btn-success" : "btn-error"
-                }`}
-            >
-              {pin.name}
-            </button>
-          ))}
-        </div> */}
       </div>
 
       {activePin && (
