@@ -44,13 +44,9 @@ function HomePage() {
       map.setFog({});
 
       const style = map.getStyle();
-
       style.layers.forEach((layer) => {
         const id = layer.id.toLowerCase();
-
-        const isMinorPlaceLabel =
-          id.includes("settlement") && !id.includes("major");
-
+        const isMinorPlaceLabel = id.includes("settlement") && !id.includes("major");
         const isPoi = id.includes("poi");
 
         if (isMinorPlaceLabel || isPoi) {
@@ -58,8 +54,8 @@ function HomePage() {
         }
       });
 
-      mapLoadedRef.current = true;
-      // deliberately NOT plotting existing pins here — this page always starts blank
+      mapLoadedRef.current = true;  
+     
     });
 
     mapRef.current = map;
@@ -79,7 +75,7 @@ function HomePage() {
     markersRef.current.forEach((m) => m.marker.remove());
     markersRef.current = [];
 
-    const marker = new mapboxgl.Marker({ color: "#e11d48" })
+    const marker = new mapboxgl.Marker({ color: "#960303" })
       .setLngLat([pin.lng, pin.lat])
       .addTo(map);
 
@@ -122,7 +118,7 @@ function HomePage() {
         essential: true,
       });
 
-      // reuse the existing DB pin if this place was already searched before (any past visit)
+      // reuse the existing DB pin if this place was already searched before 
       const existingPin = pins.find(
         (p) => p.name.toLowerCase() === place.toLowerCase()
       );
