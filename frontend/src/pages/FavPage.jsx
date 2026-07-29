@@ -15,7 +15,6 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 function FavPage() {
   const favorites = usePinStore((state) => state.favorites);
   const removeFavorite = usePinStore((state) => state.removeFavorite);
-  const pinsLoaded = usePinStore((state) => state.pinsLoaded);
   const navigate = useNavigate();
 
   const [activeFav, setActiveFav] = useState(null);
@@ -23,7 +22,6 @@ function FavPage() {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]); // { favId, marker }
-  const mapLoadedRef = useRef(false);
 
   // init globe once
   useEffect(() => {
@@ -52,80 +50,73 @@ function FavPage() {
           map.setLayoutProperty(layer.id, "visibility", "none");
         }
       });
-      mapLoadedRef.current = true;
     });
 
     mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapLoadedRef.current = false;
-      markersRef.current = [];
-    };
+    return () => map.remove();
   }, []);
 
+  // keep markers in sync with favorites, click opens remove popup
   useEffect(() => {
-    if (!mapLoadedRef.current) return;
     const map = mapRef.current;
     if (!map) return;
 
-    const existingIds = markersRef.current.map((m) => m.favId);
-    const currentIds = favorites.map((f) => f._id);
+    const plot = () => {
+      const existingIds = markersRef.current.map((m) => m.favId);
+      const currentIds = favorites.map((f) => f.id);
 
-    // remove markers for favorites that no longer exist
-    markersRef.current = markersRef.current.filter((m) => {
-      if (!currentIds.includes(m.favId)) {
-        m.marker.remove();
-        return false;
+      // remove markers for favorites that no longer exist
+      markersRef.current = markersRef.current.filter((m) => {
+        if (!currentIds.includes(m.favId)) {
+          m.marker.remove();
+          return false;
+        }
+        return true;
+      });
+
+      // add markers for new favorites only
+      const validFavs = favorites.filter((f) => f.lng != null && f.lat != null);
+
+      validFavs.forEach((fav) => {
+        if (existingIds.includes(fav.id)) return;
+
+        const marker = new mapboxgl.Marker({ color: "#ec4899" }) // pink-500
+          .setLngLat([fav.lng, fav.lat])
+          .addTo(map);
+
+        marker.getElement().style.cursor = "pointer";
+        marker.getElement().addEventListener("click", () => setActiveFav(fav));
+
+        markersRef.current.push({ favId: fav.id, marker });
+      });
+
+      if (validFavs.length > 0) {
+        const bounds = new mapboxgl.LngLatBounds();
+        validFavs.forEach((fav) => bounds.extend([fav.lng, fav.lat]));
+        map.fitBounds(bounds, { padding: 60, maxZoom: 6, duration: 1000 });
       }
-      return true;
-    });
+    };
 
-    // add markers for new favorites only
-    const validFavs = favorites.filter((f) => f.lng != null && f.lat != null);
-    const newlyAdded = [];
-
-    validFavs.forEach((fav) => {
-      if (existingIds.includes(fav._id)) return;
-
-      const marker = new mapboxgl.Marker({ color: "#ec4899" }) 
-        .setLngLat([fav.lng, fav.lat])
-        .addTo(map);
-
-      marker.getElement().style.cursor = "pointer";
-      marker.getElement().addEventListener("click", () => setActiveFav(fav));
-
-      markersRef.current.push({ favId: fav._id, marker });
-      newlyAdded.push(fav);
-    });
-
-    // only re-frame the camera when something was actually added —
-    // removing a favorite should NOT move the camera at all
-    if (newlyAdded.length > 0 && validFavs.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      validFavs.forEach((fav) => bounds.extend([fav.lng, fav.lat]));
-      map.fitBounds(bounds, { padding: 60, maxZoom: 6, duration: 1000 });
+    if (map.isStyleLoaded()) {
+      plot();
+    } else {
+      map.once("style.load", plot);
     }
   }, [favorites]);
 
-  const handleRemove = async () => {
-    await removeFavorite(activeFav._id);
+  const handleRemove = () => {
+    removeFavorite(activeFav.id);
     setActiveFav(null);
   };
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
+
       {/* Background Globe */}
       <div ref={mapContainerRef} className="fixed top-0 left-0 w-screen h-screen z-0" />
 
       {/* Navbar */}
       <div className="absolute top-0 left-0 w-full z-50 px-6"><DashboardNavbar /> </div>
-
-      {!pinsLoaded && (
-        <div className="absolute top-24 left-0 z-50 px-6">
-          <p className="text-white text-sm">Loading your wishlist…</p>
-        </div>
-      )}
 
       <div className="p-4 absolute bottom-5 left-300 z-50 px-6">
         <button className="btn bg-[#3d3939] text-white border-none hover:bg-[#282929] mb-4" onClick={() => navigate("/home")}> Go Back </button>
