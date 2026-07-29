@@ -24,7 +24,7 @@ function PinPopup({ pin, onClose }) {
             {pin.isFavorite ? "Already in Bucket List" : "Add to Bucket List"} </button>
         </div>
 
-        <button onClick={onClose} className="btn btn-ghost mt-2 w-full"> Close </button>
+        <button onClick={onClose} className="btn btn-ghost mt-2 w-full text-[#696666]"> Close </button>
       </div>
     </div>
   );

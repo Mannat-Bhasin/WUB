@@ -124,10 +124,10 @@ function FavPage() {
 
       {activeFav && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-20">
-          <div className="bg-white p-6 rounded-lg w-72">
-            <h2 className="text-lg font-bold mb-4">{activeFav.name}</h2>
-            <button className="btn btn-error w-full" onClick={handleRemove}> Remove from Bucket List </button>
-            <button className="btn btn-ghost mt-2 w-full" onClick={() => setActiveFav(null)}> Close </button>
+          <div className="glass-pinpopup p-6 rounded-lg w-72">
+            <h2 className="text-lg font-bold mb-4 text-[#cec8c8]">{activeFav.name}</h2>
+            <button className="btn bg-[#e64e67] text-white border-none w-full" onClick={handleRemove}> Remove from Bucket List </button>
+            <button className="btn btn-ghost mt-2 w-full text-[#696666]" onClick={() => setActiveFav(null)}> Close </button>
           </div>
         </div>
       )}
