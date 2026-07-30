@@ -9,7 +9,7 @@ function UploadPage() {
   
   const updatePinDescription = usePinStore((state) => state.updatePinDescription)
 
-  const updatePinDescription = usePinStore((state) => state.updatePinDescription);
+  const [loading, setLoading] = useState(true);
   const pins = usePinStore((state) => state.pins);
   const fetchPins = usePinStore((state) => state.fetchPins);
   const addPhotosToPin = usePinStore((state) => state.addPhotosToPin);
@@ -29,18 +29,26 @@ function UploadPage() {
 //     fetchPins(); // or better: fetchSinglePin(pinId) if you build that route
 //   }
 // }, [pinId]);
+useEffect(() => {
+  if (pins.length === 0) {
+    fetchPins().finally(() => setLoading(false));
+  } else {
+    setLoading(false);
+  }
+}, []);
 
   const pin = pins.find((p) => p._id === pinId);
+  const existingUrls = pin?.photos || [];
 
-  // photos already saved in Mongo for this pin, from a previous visit
-  const existingUrls = pin?.photos?.map((p) => p.url) || [];
+  // // photos already saved in Mongo for this pin, from a previous visit
+  // const existingUrls = pin?.photos?.map((p) => p.url) || [];
 
-  // combined list: old saved photos first, then any newly picked (not yet uploaded) ones
-  const collage = [...existingUrls, ...newPreviews].slice(0, 5);
+  // // combined list: old saved photos first, then any newly picked (not yet uploaded) ones
+  // const collage = [...existingUrls, ...newPreviews].slice(0, 5);
 
-  useEffect(() => {
-    if (pin?.description) setDescription(pin.description);
-  }, [pin]);
+  // useEffect(() => {
+  //   if (pin?.description) setDescription(pin.description);
+  // }, [pin]);
 
   const handleFileChange = (e) => {
     const selected = Array.from(e.target.files);
@@ -65,6 +73,17 @@ function UploadPage() {
     }
   };
 
+  if (loading) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#FAF7F2]">
+      <p className="font-mono text-sm text-[#8C8577] tracking-wide">
+        LOADING…
+      </p>
+      <span className="loading loading-dots loading-xl"></span>
+    </div>
+  );
+}
+
   if (!pin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAF7F2]">
@@ -76,10 +95,17 @@ function UploadPage() {
   }
 
   // pick up to 5 previews for the collage; fall back to placeholders
-  const photosToDisplay =
-  pin?.photos?.length > 0 ? pin.photos : previews;
-  const collage = previews.slice(0, 25);
-  const remaining = photosToDisplay.slice(10);
+  // const photosToDisplay =
+  // pin?.photos?.length > 0 ? pin.photos : previews;
+  // const collage = previews.slice(0, 25);
+  // const remaining = photosToDisplay.slice(10);/
+  const photosToDisplay = [
+  ...(pin?.photos || []),
+  ...newPreviews,
+];
+
+const collage = photosToDisplay.slice(0, 25);
+const remaining = photosToDisplay.slice(10);
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#1F2421]">
@@ -96,9 +122,10 @@ function UploadPage() {
         >
           ← BACK
         </button>
-
+{/* 
         <div className="relative mb-10">
           {collage.length > 0 ? (
+            <>
             <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[420px]">
               {collage[0] && (
                 <img src={collage[0]} className="col-span-1 row-span-1 w-full h-full object-cover rounded-sm" alt="" />
@@ -113,10 +140,12 @@ function UploadPage() {
               {collage[4] && (
                 <img src={collage[4]} className="col-span-1 row-span-1 w-full h-full object-cover rounded-sm" alt="" />
               )}
-            
-            
+            </div>
+          )
+           </div>
+        
             {remaining.length > 0 && (
-  <div className="mt-4 max-h-80 overflow-y-auto">
+  <div className="mt-4 max-h-[00px] overflow-y-auto">
     <div className="grid grid-cols-4 gap-3">
       {remaining.map((photo, index) => (
         <img
@@ -127,9 +156,43 @@ function UploadPage() {
         />
       ))}
     </div>
-  </div>
-)}
-</div>
+    )} */}
+    <div className="relative mb-10">
+  {collage.length > 0 ? (
+    <>
+      <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[420px]">
+        {collage[0] && (
+          <img src={collage[0]} className="col-span-1 row-span-1 w-full h-full object-cover rounded-sm" alt="" />
+        )}
+        {collage[1] && (
+          <img src={collage[1]} className="col-span-1 row-span-1 w-full h-full object-cover rounded-sm" alt="" />
+        )}
+        <img src={collage[2] || collage[0]} className="col-span-2 row-span-2 w-full h-full object-cover rounded-sm" alt="" />
+        {collage[3] && (
+          <img src={collage[3]} className="col-span-1 row-span-1 w-full h-full object-cover rounded-sm" alt="" />
+        )}
+        {collage[4] && (
+          <img src={collage[4]} className="col-span-1 row-span-1 w-full h-full object-cover rounded-sm" alt="" />
+        )}
+      </div>
+
+      {remaining.length > 0 && (
+        <div className="mt-4 max-h-[600px] overflow-y-auto">
+          <div className="grid grid-cols-6 gap-4">
+            {remaining.map((photo, index) => (
+              <img
+                key={index}
+                src={photo}
+                alt=""
+                className="w-full aspect-square object-cover rounded-sm"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  
+  
           ) : (
             <label className="flex flex-col items-center justify-center h-[420px] border border-dashed border-[#8C8577]/40 rounded-sm cursor-pointer hover:border-[#435E52] transition-colors">
               <span className="font-mono text-xs tracking-widest text-[#8C8577]">

@@ -24,7 +24,15 @@ function App() {
       <Route path="/login" element={<PageLogin />} />
 
     </Routes>
+    
   );
+  
+app.use((err, req, res, next) => {
+  console.log('ERROR NAME:', err.name)
+  console.log('ERROR FIELD:', err.field)
+  console.log('ERROR MESSAGE:', err.message)
+  res.status(500).json({ error: err.message, field: err.field })
+})
 }
 
 export default App;

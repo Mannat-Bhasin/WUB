@@ -87,30 +87,25 @@ const fetchPins = usePinStore((state) => state.fetchPins);
       .setLngLat([pin.lng, pin.lat])
       .addTo(map);
 
-    const newPin = await addPin(place, lng, lat, user.userId); // added await
+    
     marker.getElement().style.cursor = "pointer";
     marker.getElement().addEventListener("click", () => setActivePin(pin));
 
     markersRef.current.push({ pinId: pin._id, marker });
   };
 
-    setQuery("");
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong while searching.");
-  }
-};
-console.log("yes rendering")
+ 
+// console.log("yes rendering")
 
-console.log("Current user:", user);
+// console.log("Current user:", user);
 
-useEffect(() => {
-  console.log("useeffect User:", user);
-  if (user?.userId) {
-    console.log("Fetching pins for:", user.userId);
-    fetchPins(user.userId);   
-  }
-}, [user]);
+// useEffect(() => {
+//   console.log("useeffect User:", user);
+//   if (user?.userId) {
+//     console.log("Fetching pins for:", user.userId);
+//     fetchPins(user.userId);   
+//   }
+// }, [user]);
 
 useEffect(() => {
   if (!mapRef.current) return;
@@ -166,13 +161,14 @@ useEffect(() => {
 
       let targetPin = existingPin;
       if (!targetPin) {
-        targetPin = await addPin(place, lng, lat);
+        targetPin = await addPin(place, lng, lat, user.userId);
         if (!targetPin) {
           setSearchError("Failed to save pin. Try again.");
           return;
         }
       }
-
+      // const newPin = addPin(place, lng, lat, user.userId);
+      
       dropMarker(targetPin);
 
       map.once("moveend", () => {
@@ -185,6 +181,15 @@ useEffect(() => {
       setSearchError("Something went wrong while searching.");
     }
   };
+
+useEffect(() => {
+  console.log("useeffect User:", user);
+  if (user?.userId) {
+    console.log("Fetching pins for:", user.userId);
+    fetchPins();   
+  }
+}, [user]);
+
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
